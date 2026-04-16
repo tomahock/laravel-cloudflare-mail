@@ -67,6 +67,17 @@ Mail::raw('Hello World', function ($message) {
 });
 ```
 
+## Setting Up Cloudflare Email Sending
+
+Before sending emails, you must configure the Cloudflare Email Sending service in your account:
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) and select your account
+2. Navigate to **Email** → **Email Sending** (currently in beta — you may need to request access)
+3. Add your sender domain (e.g. `yourdomain.com`) and follow the DNS verification steps
+4. Add the required DNS records (SPF, DKIM) that Cloudflare provides for your domain
+
+> **Note:** Attempting to send emails before the domain is verified will result in a `500 Internal Server Error` from the API (`email.sending.error.internal_server`).
+
 ## Creating API Tokens
 
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **My Profile** → **API Tokens**
