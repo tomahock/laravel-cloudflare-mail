@@ -69,8 +69,8 @@ class CloudflareTransport extends AbstractTransport
     private function buildPayload(Email $email, Envelope $envelope): array
     {
         $payload = [
-            'from' => $this->formatAddress($envelope->getSender()),
-            'to' => array_map($this->formatAddress(...), $envelope->getRecipients()),
+            'from' => $this->formatSender($envelope->getSender()),
+            'to' => array_values(array_map(fn (Address $a) => $a->getAddress(), $envelope->getRecipients())),
             'subject' => $email->getSubject() ?? '',
         ];
 
@@ -83,15 +83,15 @@ class CloudflareTransport extends AbstractTransport
         }
 
         if ($ccAddresses = $email->getCc()) {
-            $payload['cc'] = array_map($this->formatAddress(...), $ccAddresses);
+            $payload['cc'] = array_values(array_map(fn (Address $a) => $a->getAddress(), $ccAddresses));
         }
 
         if ($bccAddresses = $email->getBcc()) {
-            $payload['bcc'] = array_map($this->formatAddress(...), $bccAddresses);
+            $payload['bcc'] = array_values(array_map(fn (Address $a) => $a->getAddress(), $bccAddresses));
         }
 
         if ($replyTo = $email->getReplyTo()) {
-            $payload['reply_to'] = $this->formatAddress($replyTo[0]);
+            $payload['reply_to'] = $replyTo[0]->getAddress();
         }
 
         $attachments = $this->buildAttachments($email);
@@ -102,10 +102,10 @@ class CloudflareTransport extends AbstractTransport
         return $payload;
     }
 
-    private function formatAddress(Address $address): array|string
+    private function formatSender(Address $address): array|string
     {
         if ($name = $address->getName()) {
-            return ['email' => $address->getAddress(), 'name' => $name];
+            return ['address' => $address->getAddress(), 'name' => $name];
         }
 
         return $address->getAddress();
